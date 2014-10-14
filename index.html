@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Simple Randomizing Machine">
+  <meta name="author" content="Jakub Jedryszek">
+
+  <title>Random Machine</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link href="assets/css/cover.css" rel="stylesheet">
+</head>
+
+<body>
+
+      <div class="container">
+
+        <haed>
+          <div class="inner">
+            <h1 class="masthead-brand">Random Machine</h1>
+            <img src="assets/img/random-machine.jpg" alt="Random Machine" style="width: 200px" />
+          </div>
+        </head>
+
+        <div class="inner cover">
+          <div class="row lead">
+            <div class="col-md-8">
+              <div class="form-group">
+                <label for="inputFile">Email file loader</label>
+                <input type="file" id="inputFile" data-bind="event: { change: function() { readFile($element.files[0]) } }" />                
+              </div>
+              <hr />
+              <div>Loaded emails: <var data-bind="text: emails().length"></var></div>
+              <div>Valid emails: <var data-bind="text: validEmails().length"></var></div>
+              <div>Unique emails: <var data-bind="text: uniqueEmails().length"></var></div>
+
+              <hr />
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <small>
+                    <input type="checkbox" accesskey="s" data-bind="checked: showEmails"> Show valid and unique emails
+                    <ol data-bind="foreach: uniqueEmails, visible: showEmails" class="text-left">
+                      <li data-bind="text: email"></li>
+                    </ol>
+                  </small>
+                </div>
+
+                <div class="col-md-6">
+                  <small>
+                    <a href="#" class="btn btn-lg btn-default" data-bind="click: shuffleEmails">Shuffle</a>
+                    
+                    <input type="checkbox" accesskey="s" data-bind="checked: showShuffledEmails"> Show shuffled emails
+                    <ol data-bind="foreach: uniqueEmails, visible: showShuffledEmails" class="text-left">
+                      <li data-bind="text: shuffled"></li>
+                    </ol>
+                  </small>
+                </div>
+
+                
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="form-inline" style="font-size: 15px">
+                Number of emails to withdraw: <input type="number" class="form-control" min="1" data-bind="value: emailsToDrawCount, attr: {max: uniqueEmails().length}" />
+                <a href="#" class="btn btn-lg btn-default" data-bind="click: drawEmails">Draw</a>
+              </div>
+
+              <p>
+                <h3 class="cover-heading">Results:</h3>
+                <ol data-bind="foreach: selectedEmails" class="text-left">
+                  <li data-bind="text: shuffled"></li>
+                </ol>
+                <a href="#" class="btn btn-lg btn-default" data-bind="click: exportResults">Export results to file</a> <input type="checkbox" data-bind="checked: exportShuffled, enable: shuffledPresent()" /> shuffled
+              </p>
+          </div>
+        </div>
+
+        <div class="mastfoot">
+          <div class="inner">
+            <p>Cover template for <a href="http://getbootstrap.com">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+          </div>
+        </div>
+
+      </div>
+
+
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
+  <script src="assets/js/knockout-min.js"></script>
+  <script src="viewmodel.js"></script>
+  <!-- <script src="assets/js/docs.min.js"></script>
+  IE10 viewport hack for Surface/desktop Windows 8 bug
+  <script src="assets/js/ie10-viewport-bug-workaround.js"></script> -->
+</body>
+</html>
