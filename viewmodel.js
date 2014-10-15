@@ -1,3 +1,5 @@
+/// <reference path="assets/definitions/knockout.d.ts" />
+/// <reference path="assets/definitions/jquery.d.ts" />
 var viewModel = (function () {
     var Email = function (email) {
         this.email = ko.observable(email);
@@ -12,7 +14,7 @@ var viewModel = (function () {
         reader.readAsText(f);
         reader.onload = function () {
             var text = reader.result;
-            var emailsTemp = text.split("\n");
+            var emailsTemp = text.split("\r\n");
             for (var i = 0; i < emailsTemp.length; ++i) {
                 emails.push(new Email(emailsTemp[i]));
             }
@@ -32,7 +34,6 @@ var viewModel = (function () {
         var valid = [], temp = [];
 
         for (var i = 0; i < emails().length; ++i) {
-            console.log(validateEmail(emails()[i].email()));
             if (validateEmail(emails()[i].email())) {
                 valid.push(emails()[i]);
             }
@@ -59,10 +60,11 @@ var viewModel = (function () {
     var showShuffledEmails = ko.observable(false);
 
     var shuffleEmails = function () {
-        for (var i = 0; i < emails().length; i++) {
+        for (var i = 0; i < emails().length; ++i) {
             var shuffled = shuffleString(emails()[i].email());
             emails()[i].shuffled(shuffled);
         }
+
         this.shuffledPresent(true);
     };
 
@@ -86,7 +88,8 @@ var viewModel = (function () {
     var drawEmails = function () {
         var copyOfEmails = this.uniqueEmails(), luckyNumber;
 
-        selectedEmails = ko.observableArray([]);
+        this.selectedEmails([]);
+
         for (var i = 0; i < this.emailsToDrawCount(); ++i) {
             luckyNumber = Math.floor(Math.random() * copyOfEmails.length);
             this.selectedEmails.push(copyOfEmails[luckyNumber]);
@@ -98,8 +101,21 @@ var viewModel = (function () {
 
     var exportShuffled = ko.observable(false);
 
+    // source: http://jsfiddle.net/UselessCode/qm5AG/
     var exportResults = function () {
-        // http://jsfiddle.net/UselessCode/qm5AG/
+        var result = [], data, textFile;
+
+        for (var i = 0; i < this.selectedEmails().length; ++i) {
+            if (this.exportShuffled()) {
+                result.push(this.selectedEmails()[i].shuffled() + "\r\n");
+            } else {
+                result.push(this.selectedEmails()[i].email() + "\r\n");
+            }
+        }
+
+        data = new Blob(result);
+        textFile = window["URL"].createObjectURL(data);
+        $("#downloadlink").attr("href", textFile).show();
     };
 
     return {
