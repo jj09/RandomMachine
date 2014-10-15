@@ -65,14 +65,19 @@
             <a href="#" class="btn btn-lg btn-default" data-bind="click: drawEmails">Draw</a>
           </div>
 
+          <hr />
+
           <h3 class="cover-heading">Results:</h3>
           <ol data-bind="foreach: selectedEmails" class="text-left">
             <li data-bind="text: shuffled"></li>
           </ol>
+
+          <hr />
+
           <a href="#" class="btn btn-lg btn-default" data-bind="click: exportResults">Export results to file</a> <input type="checkbox" data-bind="checked: exportShuffled, enable: shuffledPresent()" /> shuffled
           <a download="results.txt" id="downloadlink" style="display: none">Download</a>
         </div>
-        
+
       </div>
 
       <div class="mastfoot">
@@ -88,6 +93,7 @@
   <script src="assets/js/jquery.min.js"></script>
   <script src="assets/js/bootstrap.min.js"></script>
   <script src="assets/js/knockout-min.js"></script>
+  <script src="model.js"></script>
   <script src="viewmodel.js"></script>
 </body>
 </html>

@@ -1,109 +1,90 @@
 /// <reference path="assets/definitions/knockout.d.ts" />
 /// <reference path="assets/definitions/jquery.d.ts" />
-var viewModel = (function () {
-    var Email = function (email) {
-        this.email = ko.observable(email);
-        this.shuffled = ko.observable("");
-    };
+/// <reference path="model.ts" />
+var Email = Model.Email;
 
-    var emails = ko.observableArray([]);
+var ViewModel = (function () {
+    function ViewModel() {
+        var _this = this;
+        this.emails = ko.observableArray([]);
+        this.showEmails = ko.observable(false);
+        this.showShuffledEmails = ko.observable(false);
+        this.selectedEmails = ko.observableArray([]);
+        this.emailsToDrawCount = ko.observable(1);
+        this.shuffledPresent = ko.observable(false);
+        this.exportShuffled = ko.observable(false);
 
+        this.validEmails = ko.computed(function () {
+            var valid = [], temp = [];
+            for (var i = 0; i < _this.emails().length; ++i) {
+                if (_this.validateEmail(_this.emails()[i].email())) {
+                    valid.push(_this.emails()[i]);
+                }
+            }
+
+            return valid;
+        });
+
+        this.uniqueEmails = ko.computed(function () {
+            var unique = [], temp = [];
+
+            for (var i = 0; i < _this.validEmails().length; ++i) {
+                if (!temp[_this.validEmails()[i].email()]) {
+                    temp[_this.validEmails()[i].email()] = true;
+                    unique.push(_this.validEmails()[i]);
+                }
+            }
+
+            return unique;
+        });
+    }
     // source: https://www.inkling.com/read/javascript-definitive-guide-david-flanagan-6th/chapter-22/reading-text-files-with
-    var readFile = function (f) {
+    ViewModel.prototype.readFile = function (f) {
+        var _this = this;
         var reader = new FileReader();
         reader.readAsText(f);
+
         reader.onload = function () {
             var text = reader.result;
             var emailsTemp = text.split("\r\n");
             for (var i = 0; i < emailsTemp.length; ++i) {
-                emails.push(new Email(emailsTemp[i]));
+                _this.emails.push(new Email(emailsTemp[i]));
             }
         };
+
         reader.onerror = function (e) {
             alert("Error", e);
             console.log("Error", e);
         };
     };
 
-    var validateEmail = function (email) {
-        var re = /\S+@\S+\.\S+/;
-        return re.test(email);
-    };
-
-    var validEmails = ko.computed(function () {
-        var valid = [], temp = [];
-
-        for (var i = 0; i < emails().length; ++i) {
-            if (validateEmail(emails()[i].email())) {
-                valid.push(emails()[i]);
-            }
-        }
-
-        return valid;
-    });
-
-    var uniqueEmails = ko.computed(function () {
-        var unique = [], temp = [];
-
-        for (var i = 0; i < validEmails().length; ++i) {
-            if (!temp[validEmails()[i].email()]) {
-                temp[validEmails()[i].email()] = true;
-                unique.push(validEmails()[i]);
-            }
-        }
-
-        return unique;
-    });
-
-    var showEmails = ko.observable(false);
-
-    var showShuffledEmails = ko.observable(false);
-
-    var shuffleEmails = function () {
-        for (var i = 0; i < emails().length; ++i) {
-            var shuffled = shuffleString(emails()[i].email());
-            emails()[i].shuffled(shuffled);
+    ViewModel.prototype.shuffleEmails = function () {
+        for (var i = 0; i < this.emails().length; ++i) {
+            var shuffled = this.shuffleString(this.emails()[i].email());
+            this.emails()[i].shuffled(shuffled);
         }
 
         this.shuffledPresent(true);
     };
 
-    var shuffleString = function (str) {
-        var a = str.split(""), n = a.length;
-
-        for (var i = n - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var tmp = a[i];
-            a[i] = a[j];
-            a[j] = tmp;
-        }
-
-        return a.join("");
-    };
-
-    var selectedEmails = ko.observableArray([]);
-
-    var emailsToDrawCount = ko.observable(1);
-
-    var drawEmails = function () {
+    ViewModel.prototype.drawEmails = function () {
         var copyOfEmails = this.uniqueEmails(), luckyNumber;
 
         this.selectedEmails([]);
 
         for (var i = 0; i < this.emailsToDrawCount(); ++i) {
             luckyNumber = Math.floor(Math.random() * copyOfEmails.length);
+            console.log(luckyNumber);
             this.selectedEmails.push(copyOfEmails[luckyNumber]);
             copyOfEmails.splice(luckyNumber, 1);
         }
     };
 
-    var shuffledPresent = ko.observable(false);
-
-    var exportShuffled = ko.observable(false);
-
     // source: http://jsfiddle.net/UselessCode/qm5AG/
-    var exportResults = function () {
+    ViewModel.prototype.exportResults = function () {
         var result = [], data, textFile;
+
+        $("#downloadlink").attr("href", textFile).fadeOut(200);
 
         for (var i = 0; i < this.selectedEmails().length; ++i) {
             if (this.exportShuffled()) {
@@ -115,24 +96,27 @@ var viewModel = (function () {
 
         data = new Blob(result);
         textFile = window["URL"].createObjectURL(data);
-        $("#downloadlink").attr("href", textFile).show();
+        $("#downloadlink").attr("href", textFile).fadeIn(200);
     };
 
-    return {
-        readFile: readFile,
-        emails: emails,
-        uniqueEmails: uniqueEmails,
-        showEmails: showEmails,
-        validEmails: validEmails,
-        shuffleEmails: shuffleEmails,
-        showShuffledEmails: showShuffledEmails,
-        emailsToDrawCount: emailsToDrawCount,
-        drawEmails: drawEmails,
-        selectedEmails: selectedEmails,
-        shuffledPresent: shuffledPresent,
-        exportShuffled: exportShuffled,
-        exportResults: exportResults
+    ViewModel.prototype.validateEmail = function (email) {
+        var re = /\S+@\S+\.\S+/;
+        return re.test(email);
     };
+
+    ViewModel.prototype.shuffleString = function (str) {
+        var a = str.split(""), n = a.length;
+
+        for (var i = n - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = a[i];
+            a[i] = a[j];
+            a[j] = tmp;
+        }
+
+        return a.join("");
+    };
+    return ViewModel;
 })();
 
-ko.applyBindings(viewModel);
+ko.applyBindings(new ViewModel());
