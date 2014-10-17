@@ -31,9 +31,9 @@ class ViewModel {
 
     reader.onload = () => {
       var text = reader.result;
-      var emailsTemp = text.split("\r\n");
-      for(var i = 0; i<emailsTemp.length; ++i) {
-      	this.emails.push(new Email(emailsTemp[i]));
+      var emailsTemp = text.split(this.newLineDelimiter);
+      for(var i = 0; i<emailsTemp.length; ++i) {      	
+      	this.emails.push(new Email(emailsTemp[i].replace("\r","")));
       }
     }
 
@@ -74,12 +74,11 @@ class ViewModel {
 
   	for(var i = 0; i<this.selectedEmails().length; ++i) {
   	  if(this.exportShuffled()) {
-  	    result.push(this.selectedEmails()[i].shuffled() + "\r\n");
+  	    result.push(this.selectedEmails()[i].shuffled() + this.newLineDelimiter);
   	  } else {
-  	  	result.push(this.selectedEmails()[i].email() + "\r\n");
+  	  	result.push(this.selectedEmails()[i].email() + this.newLineDelimiter);
   	  }
   	}
-
 
   	data = new Blob(result);
   	textFile = window["URL"].createObjectURL(data);	// source: http://jsfiddle.net/UselessCode/qm5AG/
@@ -105,6 +104,8 @@ class ViewModel {
 
     return a.join("");
   }
+
+  private newLineDelimiter: String = "\n";
 
   constructor() {
     this.emails = ko.observableArray([]);

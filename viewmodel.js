@@ -6,6 +6,7 @@ var Email = Model.Email;
 var ViewModel = (function () {
     function ViewModel() {
         var _this = this;
+        this.newLineDelimiter = "\n";
         this.emails = ko.observableArray([]);
         this.showEmails = ko.observable(false);
         this.showShuffledEmails = ko.observable(false);
@@ -46,9 +47,9 @@ var ViewModel = (function () {
 
         reader.onload = function () {
             var text = reader.result;
-            var emailsTemp = text.split("\r\n");
+            var emailsTemp = text.split(_this.newLineDelimiter);
             for (var i = 0; i < emailsTemp.length; ++i) {
-                _this.emails.push(new Email(emailsTemp[i]));
+                _this.emails.push(new Email(emailsTemp[i].replace("\r", "")));
             }
         };
 
@@ -74,13 +75,11 @@ var ViewModel = (function () {
 
         for (var i = 0; i < this.emailsToDrawCount(); ++i) {
             luckyNumber = Math.floor(Math.random() * copyOfEmails.length);
-            console.log(luckyNumber);
             this.selectedEmails.push(copyOfEmails[luckyNumber]);
             copyOfEmails.splice(luckyNumber, 1);
         }
     };
 
-    // source: http://jsfiddle.net/UselessCode/qm5AG/
     ViewModel.prototype.exportResults = function () {
         var result = [], data, textFile;
 
@@ -88,14 +87,15 @@ var ViewModel = (function () {
 
         for (var i = 0; i < this.selectedEmails().length; ++i) {
             if (this.exportShuffled()) {
-                result.push(this.selectedEmails()[i].shuffled() + "\r\n");
+                result.push(this.selectedEmails()[i].shuffled() + this.newLineDelimiter);
             } else {
-                result.push(this.selectedEmails()[i].email() + "\r\n");
+                result.push(this.selectedEmails()[i].email() + this.newLineDelimiter);
             }
         }
 
         data = new Blob(result);
-        textFile = window["URL"].createObjectURL(data);
+        textFile = window["URL"].createObjectURL(data); // source: http://jsfiddle.net/UselessCode/qm5AG/
+
         $("#downloadlink").attr("href", textFile).fadeIn(200);
     };
 
