@@ -13,3 +13,5 @@ Random Machine is a simple randomizing machine, which can be used to drawing spe
 	* Add option to remove withdraw emails
 * Improve template
 	* Add e.g. Toastr to notify about actions (e.g. when emails are exported)
+	* Fix footer (it covers shuffled emails, when there are many of them)
+	* fix header: better logo? better alignment?
