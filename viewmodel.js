@@ -27,7 +27,7 @@ var ViewModel = (function () {
         });
 
         this.uniqueEmails = ko.computed(function () {
-            var unique = [], temp = [];
+            var unique = [], temp = new Array();
 
             for (var i = 0; i < _this.validEmails().length; ++i) {
                 if (!temp[_this.validEmails()[i].email()]) {
@@ -94,7 +94,7 @@ var ViewModel = (function () {
         }
 
         data = new Blob(result);
-        textFile = window["URL"].createObjectURL(data); // source: http://jsfiddle.net/UselessCode/qm5AG/
+        textFile = window.URL.createObjectURL(data); // source: http://jsfiddle.net/UselessCode/qm5AG/
 
         $("#downloadlink").attr("href", textFile).fadeIn(200);
     };

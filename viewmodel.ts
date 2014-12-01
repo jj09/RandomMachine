@@ -16,31 +16,33 @@ class ViewModel {
 
   public shuffledPresent: KnockoutObservable<boolean>;
 
-  public showShuffledEmails: KnockoutObservable<boolean>;    
+  public showShuffledEmails: KnockoutObservable<boolean>;
 
   public emailsToDrawCount: KnockoutObservable<number>;
 
   public selectedEmails: KnockoutObservableArray<Email>;
 
-  public exportShuffled: KnockoutObservable<boolean>;   
-  
+  public exportShuffled: KnockoutObservable<boolean>;
+
+  private newLineDelimiter: String = "\n";
+
   // source: https://www.inkling.com/read/javascript-definitive-guide-david-flanagan-6th/chapter-22/reading-text-files-with
-  public readFile (f): void {
+  public readFile (f: any): void {
     var reader = new FileReader();
     reader.readAsText(f);
 
     reader.onload = () => {
       var text = reader.result;
       var emailsTemp = text.split(this.newLineDelimiter);
-      for(var i = 0; i<emailsTemp.length; ++i) {      	
+      for(var i = 0; i<emailsTemp.length; ++i) {
       	this.emails.push(new Email(emailsTemp[i].replace("\r","")));
       }
-    }
+    };
 
-    reader.onerror = (e) => {
+    reader.onerror = (e: any) => {
 	  alert("Error", e);
 	  console.log("Error", e);
-    }
+    };
   }
 
   public shuffleEmails (): void {
@@ -59,13 +61,13 @@ class ViewModel {
   	this.selectedEmails([]);
 
   	for(var i = 0; i<this.emailsToDrawCount(); ++i) {
-  	  luckyNumber = Math.floor(Math.random() * copyOfEmails.length);  	  
+  	  luckyNumber = Math.floor(Math.random() * copyOfEmails.length);
   	  this.selectedEmails.push(copyOfEmails[luckyNumber]);
   	  copyOfEmails.splice(luckyNumber, 1);
   	}
   }
 
-  public exportResults (): void {  	
+  public exportResults (): void {
   	var result = [],
   		data,
   		textFile;
@@ -81,17 +83,17 @@ class ViewModel {
   	}
 
   	data = new Blob(result);
-  	textFile = window["URL"].createObjectURL(data);	// source: http://jsfiddle.net/UselessCode/qm5AG/
+  	textFile = window.URL.createObjectURL(data);	// source: http://jsfiddle.net/UselessCode/qm5AG/
 
   	$("#downloadlink").attr("href", textFile).fadeIn(200);
-  }  
+  }
 
-  private validateEmail (email): boolean { 
+  private validateEmail (email: string): boolean {
     var re = /\S+@\S+\.\S+/;
     return re.test(email);
   }
 
-  private shuffleString (str): string {
+  private shuffleString (str: string): string {
   	var a = str.split(""),
         n = a.length;
 
@@ -105,9 +107,9 @@ class ViewModel {
     return a.join("");
   }
 
-  private newLineDelimiter: String = "\n";
-
   constructor() {
+    var valid = [];
+
     this.emails = ko.observableArray([]);
     this.showEmails = ko.observable(false);
   	this.showShuffledEmails = ko.observable(false);
@@ -117,8 +119,7 @@ class ViewModel {
   	this.exportShuffled = ko.observable(false);
 
     this.validEmails = ko.computed(() => {
-	  var valid = [],
-	      temp = [];
+
 	  for(var i = 0; i < this.emails().length; ++i) {
 	    if(this.validateEmail(this.emails()[i].email())) {
 	  	  valid.push(this.emails()[i]);
@@ -141,8 +142,7 @@ class ViewModel {
 
 	    return unique;
 	  });
-  } 
-
+  }
 }
 
 ko.applyBindings(new ViewModel());

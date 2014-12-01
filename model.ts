@@ -1,6 +1,8 @@
 /// <reference path="assets/definitions/knockout.d.ts" />
 
 module Model {
+  "use strict";
+
   export class Email {
     public email: KnockoutObservable<string>;
     public shuffled: KnockoutObservable<string>;
